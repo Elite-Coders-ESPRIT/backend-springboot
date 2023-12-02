@@ -1,7 +1,9 @@
 package tn.esprit.spring.Service;
 
+import tn.esprit.spring.Repository.BlocRepository;
 import tn.esprit.spring.Repository.FoyerRepository;
 import tn.esprit.spring.Repository.UniversiteRepository;
+import tn.esprit.spring.entity.Bloc;
 import tn.esprit.spring.entity.Foyer;
 import tn.esprit.spring.entity.TypeC;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +11,7 @@ import org.springframework.stereotype.Service;
 import tn.esprit.spring.entity.Universite;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class FoyerService implements FoyerServiceImpl {
@@ -16,6 +19,8 @@ public class FoyerService implements FoyerServiceImpl {
     FoyerRepository foyerRepository;
     @Autowired
     UniversiteRepository universiteRepository;
+    @Autowired
+    BlocRepository blocRepository;
 
     @Override
     public Foyer addFoyer(Foyer foyer) { return foyerRepository.save(foyer); }
@@ -58,5 +63,42 @@ public class FoyerService implements FoyerServiceImpl {
     @Override
     public long findCapaciteFoyerByIdBloc(Long Idbloc) {
         return foyerRepository.findCapaciteFoyerByIdBloc(Idbloc);
+    }
+    @Override
+    public List<Universite> findAllUniversiteNoAffecte() {
+        return foyerRepository.findAllUniversiteNoAffecte();
+    }
+    @Override
+    public List<Bloc> FindAllBlocsNull() {
+        return foyerRepository.FindAllBlocsNull();
+    }
+    @Override
+    public Optional<Foyer> findFoyerByIdf(Long idFoyer) {
+        return foyerRepository.findById(idFoyer);
+    }
+    @Override
+    public String assignBlocsToFoyersById(Long idFoyer, List<Bloc> blocs) {
+        Foyer f = foyerRepository.findById(idFoyer).orElse(null);
+        if (f != null && !blocs.isEmpty()) {
+            for (Bloc b : blocs) {
+                b.setFoyers(f);
+                blocRepository.save(b);
+            }
+            return "Blocs assigned to Foyer successfully!";
+        } else {
+            return "Foyer not found or no blocs provided!";
+        }
+    }
+    @Override
+    public List<Object[]> getNombreEtudiantsParFoyer() {
+        return foyerRepository.getNombreEtudiantsParFoyer();
+    }
+    @Override
+    public List<Object[]> getNombreChambresParFoyer() {
+        return foyerRepository.getNombreChambresParFoyer();
+    }
+    @Override
+    public List<Object[]> getNombreChambresParFoyerByType() {
+        return foyerRepository.getNombreChambresParFoyerByType();
     }
 }
